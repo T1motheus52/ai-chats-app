@@ -198,6 +198,20 @@
             padding: 10px 0;
         }
         
+        .tg-channel {
+            display: block;
+            margin-top: 15px;
+            color: #6a11cb;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        
+        .tg-channel:hover {
+            color: #ff00ff;
+            text-decoration: underline;
+        }
+        
         /* Стили для Telegram WebApp */
         .tg-header {
             display: none;
@@ -206,19 +220,6 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             justify-content: space-between;
             align-items: center;
-        }
-        
-        .tg-back-button {
-            background: none;
-            border: none;
-            color: #fff;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-        
-        .tg-title {
-            font-size: 1rem;
-            font-weight: 600;
         }
         
         /* Адаптивность для Telegram */
@@ -269,13 +270,9 @@
             <div class="loader-spinner"></div>
         </div>
         
-        <!-- Заголовок для Telegram -->
-        <div class="tg-header" :style="{ display: isTelegram ? 'flex' : 'none' }">
-            <button class="tg-back-button" @click="goBack">
-                <i class="fas fa-arrow-left"></i>
-            </button>
+        <!-- Заголовок для Telegram (скрыт) -->
+        <div class="tg-header" style="display: none;">
             <div class="tg-title">AI Chats</div>
-            <div style="width: 24px;"></div>
         </div>
         
         <div class="app-container">
@@ -339,6 +336,9 @@
             <!-- Футер -->
             <div class="footer">
                 <p>© 2025 AI Chat Hub | Все права защищены</p>
+                <a href="https://t.me/AIChats_Channel" class="tg-channel" target="_blank">
+                    <i class="fab fa-telegram-plane"></i> @AIChats_Channel
+                </a>
             </div>
         </div>
     </div>
@@ -357,11 +357,7 @@
                     this.isTelegram = true;
                     this.tg = window.Telegram.WebApp;
                     this.tg.expand(); // Раскрываем на весь экран
-                    this.tg.enableClosingConfirmation(); // Подтверждение закрытия
                     this.tg.ready(); // Сообщаем Telegram, что приложение готово
-                    
-                    // Настраиваем кнопку назад
-                    this.tg.BackButton.onClick(this.goBack);
                 }
             },
             methods: {
@@ -387,13 +383,6 @@
                         }, 2000);
                     } else {
                         window.open(url, '_blank');
-                    }
-                },
-                goBack() {
-                    if (this.isTelegram) {
-                        this.tg.close();
-                    } else {
-                        window.history.back();
                     }
                 }
             }
