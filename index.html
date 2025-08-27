@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chats | Telegram Mini App</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a0a14 0%, #1a1a2a 50%, #24243e 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+        
+        .app-container {
+            width: 100%;
+            max-width: 100%;
+            background: rgba(10, 10, 20, 0.95);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-top: 10px;
+        }
+        
+        .logo {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #6a11cb, #2575fc, #ff00ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 5px;
+            text-shadow: 0 0 15px rgba(138, 43, 226, 0.5);
+        }
+        
+        .tagline {
+            font-size: 0.9rem;
+            color: #b8b8d0;
+            margin-top: 5px;
+            font-weight: 400;
+        }
+        
+        .platform-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .platform-button {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 15px;
+            border-radius: 12px;
+            border: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chai-button {
+            background: linear-gradient(90deg, #1a1a2a 0%, #16213e 100%);
+            box-shadow: 0 4px 12px rgba(37, 117, 252, 0.25), 
+                        inset 0 0 0 1px rgba(106, 17, 203, 0.4);
+        }
+        
+        .chai-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(37, 117, 252, 0.35),
+                        inset 0 0 0 1px rgba(106, 17, 203, 0.6);
+        }
+        
+        .cai-button {
+            background: linear-gradient(90deg, #1a1a2a 0%, #24243e 100%);
+            box-shadow: 0 4px 12px rgba(255, 0, 255, 0.25),
+                        inset 0 0 0 1px rgba(213, 0, 249, 0.4);
+        }
+        
+        .cai-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 0, 255, 0.35),
+                        inset 0 0 0 1px rgba(213, 0, 249, 0.6);
+        }
+        
+        .button-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .button-icon {
+            font-size: 1.1rem;
+            width: 22px;
+            text-align: center;
+        }
+        
+        .chai-button .button-icon {
+            color: #6a11cb;
+        }
+        
+        .cai-button .button-icon {
+            color: #ff00ff;
+        }
+        
+        .button-arrow {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        .comparison-table {
+            margin: 20px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(25, 25, 40, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 0.85rem;
+        }
+        
+        .table-header {
+            display: flex;
+            background: rgba(40, 40, 60, 0.8);
+        }
+        
+        .table-header-cell {
+            flex: 1;
+            text-align: center;
+            padding: 10px 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .chai-header {
+            background: linear-gradient(90deg, rgba(106, 17, 203, 0.7) 0%, rgba(37, 117, 252, 0.7) 100%);
+        }
+        
+        .cai-header {
+            background: linear-gradient(90deg, rgba(255, 0, 255, 0.7) 0%, rgba(213, 0, 249, 0.7) 100%);
+        }
+        
+        .table-row {
+            display: flex;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        
+        .table-row:last-child {
+            border-bottom: none;
+        }
+        
+        .table-cell {
+            flex: 1;
+            padding: 8px 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+        
+        .feature-name {
+            text-align: left;
+            font-weight: 600;
+            color: #d0d0e0;
+            background: rgba(30, 30, 45, 0.5);
+            font-size: 0.75rem;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #66668a;
+            font-size: 0.7rem;
+            padding: 10px 0;
+        }
+        
+        /* Стили для Telegram WebApp */
+        .tg-header {
+            display: none;
+            padding: 10px 15px;
+            background: rgba(40, 40, 60, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .tg-back-button {
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .tg-title {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        /* Адаптивность для Telegram */
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+            }
+            
+            .app-container {
+                border-radius: 0;
+                min-height: 100vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Заголовок для Telegram -->
+        <div class="tg-header" :style="{ display: isTelegram ? 'flex' : 'none' }">
+            <button class="tg-back-button" @click="goBack">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="tg-title">AI Chats</div>
+            <div style="width: 24px;"></div>
+        </div>
+        
+        <div class="app-container">
+            <!-- Заголовок -->
+            <div class="header">
+                <div class="logo">AI Chats</div>
+                <div class="tagline">Выберите платформу для общения с ИИ</div>
+            </div>
+            
+            <!-- Кнопки платформ -->
+            <div class="platform-buttons">
+                <button class="platform-button chai-button" @click="navigateToChai">
+                    <div class="button-content">
+                        <i class="fas fa-comment-dots button-icon"></i>
+                        <span>Перейти в Chai</span>
+                    </div>
+                    <i class="fas fa-arrow-right button-arrow"></i>
+                </button>
+                
+                <button class="platform-button cai-button" @click="navigateToCharacterAI">
+                    <div class="button-content">
+                        <i class="fas fa-robot button-icon"></i>
+                        <span>Перейти в c.ai</span>
+                    </div>
+                    <i class="fas fa-arrow-right button-arrow"></i>
+                </button>
+            </div>
+            
+            <!-- Таблица сравнения -->
+            <div class="comparison-table">
+                <div class="table-header">
+                    <div class="table-header-cell chai-header">Chai</div>
+                    <div class="table-header-cell cai-header">Character.ai</div>
+                </div>
+                
+                <div class="table-row">
+                    <div class="table-cell feature-name">Тип платформы</div>
+                    <div class="table-cell">Развлекательный чат</div>
+                    <div class="table-cell">Образовательный/развлекательный</div>
+                </div>
+                
+                <div class="table-row">
+                    <div class="table-cell feature-name">Монетизация</div>
+                    <div class="table-cell">Премиум-подписка</div>
+                    <div class="table-cell">Бесплатный доступ</div>
+                </div>
+                
+                <div class="table-row">
+                    <div class="table-cell feature-name">Создание ботов</div>
+                    <div class="table-cell">Ограниченные возможности</div>
+                    <div class="table-cell">Расширенные возможности</div>
+                </div>
+                
+                <div class="table-row">
+                    <div class="table-cell feature-name">Фильтрация контента</div>
+                    <div class="table-cell">Минимальная</div>
+                    <div class="table-cell">Строгая</div>
+                </div>
+            </div>
+            
+            <!-- Футер -->
+            <div class="footer">
+                <p>© 2025 AI Chat Hub | Все права защищены</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                isTelegram: false,
+                tg: null
+            },
+            mounted() {
+                // Проверяем, открыто ли в Telegram WebApp
+                if (window.Telegram && window.Telegram.WebApp) {
+                    this.isTelegram = true;
+                    this.tg = window.Telegram.WebApp;
+                    this.tg.expand(); // Раскрываем на весь экран
+                    this.tg.enableClosingConfirmation(); // Подтверждение закрытия
+                    this.tg.ready(); // Сообщаем Telegram, что приложение готово
+                    
+                    // Настраиваем кнопку назад
+                    this.tg.BackButton.onClick(this.goBack);
+                }
+            },
+            methods: {
+                navigateToChai() {
+                    const url = 'https://web.chai-research.com/chats/';
+                    if (this.isTelegram) {
+                        this.tg.openLink(url);
+                    } else {
+                        window.open(url, '_blank');
+                    }
+                },
+                navigateToCharacterAI() {
+                    const url = 'https://beta.character.ai/';
+                    if (this.isTelegram) {
+                        this.tg.openLink(url);
+                    } else {
+                        window.open(url, '_blank');
+                    }
+                },
+                goBack() {
+                    if (this.isTelegram) {
+                        this.tg.close();
+                    } else {
+                        window.history.back();
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
