@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Chats | Telegram Mini App</title>
+    <title>AI Chats</title>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -197,36 +197,58 @@
             padding: 10px 0;
         }
         
-        .status-indicator {
-            text-align: center;
-            margin: 15px 0;
-            padding: 10px;
-            border-radius: 8px;
-            background: rgba(255, 0, 0, 0.1);
-            border: 1px solid rgba(255, 0, 0, 0.3);
-            color: #ff6b6b;
-            font-size: 0.9rem;
+        /* Стили для Telegram WebApp */
+        .tg-header {
+            display: none;
+            padding: 10px 15px;
+            background: rgba(40, 40, 60, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            justify-content: space-between;
+            align-items: center;
         }
         
-        .success-indicator {
-            background: rgba(0, 255, 0, 0.1);
-            border: 1px solid rgba(0, 255, 0, 0.3);
-            color: #6bff6b;
+        .tg-back-button {
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .tg-title {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        /* Адаптивность для Telegram */
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+            }
+            
+            .app-container {
+                border-radius: 0;
+                min-height: 100vh;
+            }
         }
     </style>
 </head>
 <body>
     <div id="app">
+        <!-- Заголовок для Telegram -->
+        <div class="tg-header" :style="{ display: isTelegram ? 'flex' : 'none' }">
+            <button class="tg-back-button" @click="goBack">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="tg-title">AI Chats</div>
+            <div style="width: 24px;"></div>
+        </div>
+        
         <div class="app-container">
             <!-- Заголовок -->
             <div class="header">
                 <div class="logo">AI Chats</div>
                 <div class="tagline">Выберите платформу для общения с ИИ</div>
-            </div>
-            
-            <!-- Индикатор статуса GitHub Pages -->
-            <div class="status-indicator" :class="{ 'success-indicator': isDeployed }">
-                {{ statusMessage }}
             </div>
             
             <!-- Кнопки платформ -->
@@ -280,33 +302,6 @@
                 </div>
             </div>
             
-            <!-- Инструкция по настройке GitHub Pages -->
-            <div class="comparison-table">
-                <div class="table-header">
-                    <div class="table-header-cell">Инструкция по настройке GitHub Pages</div>
-                </div>
-                
-                <div class="table-row">
-                    <div class="table-cell feature-name">1. Создание репозитория</div>
-                    <div class="table-cell">Создайте публичный репозиторий с именем username.github.io (замените username на ваш логин)</div>
-                </div>
-                
-                <div class="table-row">
-                    <div class="table-cell feature-name">2. Загрузка файла</div>
-                    <div class="table-cell">Загрузите этот HTML файл с именем index.html в корень репозитория</div>
-                </div>
-                
-                <div class="table-row">
-                    <div class="table-cell feature-name">3. Настройка Pages</div>
-                    <div class="table-cell">В настройках репозитория перейдите в раздел Pages → Source → выберите main branch</div>
-                </div>
-                
-                <div class="table-row">
-                    <div class="table-cell feature-name">4. Ожидание</div>
-                    <div class="table-cell">Подождите 1-5 минут, пока сайт опубликуется</div>
-                </div>
-            </div>
-            
             <!-- Футер -->
             <div class="footer">
                 <p>© 2025 AI Chat Hub | Все права защищены</p>
@@ -318,24 +313,26 @@
         new Vue({
             el: '#app',
             data: {
-                isDeployed: false,
-                statusMessage: 'Статус: GitHub Pages не настроен. Следуйте инструкции ниже.'
+                isTelegram: false,
+                tg: null
             },
             mounted() {
                 // Проверяем, открыто ли в Telegram WebApp
                 if (window.Telegram && window.Telegram.WebApp) {
+                    this.isTelegram = true;
                     this.tg = window.Telegram.WebApp;
-                    this.tg.expand();
-                    this.tg.ready();
+                    this.tg.expand(); // Раскрываем на весь экран
+                    this.tg.enableClosingConfirmation(); // Подтверждение закрытия
+                    this.tg.ready(); // Сообщаем Telegram, что приложение готово
+                    
+                    // Настраиваем кнопку назад
+                    this.tg.BackButton.onClick(this.goBack);
                 }
-                
-                // Проверяем, доступен ли сайт через GitHub Pages
-                this.checkGitHubPagesStatus();
             },
             methods: {
                 navigateToChai() {
                     const url = 'https://web.chai-research.com/chats/';
-                    if (this.tg) {
+                    if (this.isTelegram) {
                         this.tg.openLink(url);
                     } else {
                         window.open(url, '_blank');
@@ -343,18 +340,17 @@
                 },
                 navigateToCharacterAI() {
                     const url = 'https://beta.character.ai/';
-                    if (this.tg) {
+                    if (this.isTelegram) {
                         this.tg.openLink(url);
                     } else {
                         window.open(url, '_blank');
                     }
                 },
-                checkGitHubPagesStatus() {
-                    // Простая проверка - если мы не на localhost, возможно, это GitHub Pages
-                    if (!window.location.hostname.includes('localhost') && 
-                        !window.location.hostname.includes('127.0.0.1')) {
-                        this.isDeployed = true;
-                        this.statusMessage = 'Статус: Сайт размещен на GitHub Pages!';
+                goBack() {
+                    if (this.isTelegram) {
+                        this.tg.close();
+                    } else {
+                        window.history.back();
                     }
                 }
             }
