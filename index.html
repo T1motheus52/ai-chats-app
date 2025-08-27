@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Chats</title>
+    <title>AI Chats | Telegram Mini App</title>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
+        /* Стили остаются без изменений */
         * {
             margin: 0;
             padding: 0;
@@ -231,10 +232,43 @@
                 min-height: 100vh;
             }
         }
+        
+        /* Индикатор загрузки */
+        .loader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 20, 0.9);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .loader-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            border-top: 4px solid #6a11cb;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
     <div id="app">
+        <!-- Индикатор загрузки -->
+        <div class="loader" :style="{ display: loading ? 'flex' : 'none' }">
+            <div class="loader-spinner"></div>
+        </div>
+        
         <!-- Заголовок для Telegram -->
         <div class="tg-header" :style="{ display: isTelegram ? 'flex' : 'none' }">
             <button class="tg-back-button" @click="goBack">
@@ -314,7 +348,8 @@
             el: '#app',
             data: {
                 isTelegram: false,
-                tg: null
+                tg: null,
+                loading: false
             },
             mounted() {
                 // Проверяем, открыто ли в Telegram WebApp
@@ -332,16 +367,24 @@
             methods: {
                 navigateToChai() {
                     const url = 'https://web.chai-research.com/chats/';
-                    if (this.isTelegram) {
-                        this.tg.openLink(url);
-                    } else {
-                        window.open(url, '_blank');
-                    }
+                    this.openInTelegramWebView(url);
                 },
                 navigateToCharacterAI() {
                     const url = 'https://beta.character.ai/';
+                    this.openInTelegramWebView(url);
+                },
+                openInTelegramWebView(url) {
                     if (this.isTelegram) {
-                        this.tg.openLink(url);
+                        // Показываем индикатор загрузки
+                        this.loading = true;
+                        
+                        // Открываем во внутреннем браузере Telegram
+                        this.tg.openLink(url, { try_instant_view: true });
+                        
+                        // Скрываем индикатор загрузки через некоторое время
+                        setTimeout(() => {
+                            this.loading = false;
+                        }, 2000);
                     } else {
                         window.open(url, '_blank');
                     }
