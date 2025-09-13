@@ -8,7 +8,6 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
-        /* Стили остаются без изменений */
         * {
             margin: 0;
             padding: 0;
@@ -212,7 +211,6 @@
             text-decoration: underline;
         }
         
-        /* Стили для Telegram WebApp */
         .tg-header {
             display: none;
             padding: 10px 15px;
@@ -222,7 +220,6 @@
             align-items: center;
         }
         
-        /* Адаптивность для Telegram */
         @media (max-width: 768px) {
             body {
                 padding: 0;
@@ -234,7 +231,6 @@
             }
         }
         
-        /* Индикатор загрузки */
         .loader {
             display: none;
             position: fixed;
@@ -265,24 +261,20 @@
 </head>
 <body>
     <div id="app">
-        <!-- Индикатор загрузки -->
         <div class="loader" :style="{ display: loading ? 'flex' : 'none' }">
             <div class="loader-spinner"></div>
         </div>
         
-        <!-- Заголовок для Telegram (скрыт) -->
         <div class="tg-header" style="display: none;">
             <div class="tg-title">AI Chats</div>
         </div>
         
         <div class="app-container">
-            <!-- Заголовок -->
             <div class="header">
                 <div class="logo">AI Chats</div>
                 <div class="tagline">Выберите платформу для общения с ИИ</div>
             </div>
             
-            <!-- Кнопки платформ -->
             <div class="platform-buttons">
                 <button class="platform-button chai-button" @click="navigateToChai">
                     <div class="button-content">
@@ -301,7 +293,6 @@
                 </button>
             </div>
             
-            <!-- Таблица сравнения -->
             <div class="comparison-table">
                 <div class="table-header">
                     <div class="table-header-cell chai-header">Chai</div>
@@ -333,7 +324,6 @@
                 </div>
             </div>
             
-            <!-- Футер -->
             <div class="footer">
                 <p>© 2025 AI Chats | Все права защищены</p>
                 <a href="https://t.me/AIChats_Channel" class="tg-channel" target="_blank">
@@ -352,12 +342,11 @@
                 loading: false
             },
             mounted() {
-                // Проверяем, открыто ли в Telegram WebApp
                 if (window.Telegram && window.Telegram.WebApp) {
                     this.isTelegram = true;
                     this.tg = window.Telegram.WebApp;
-                    this.tg.expand(); // Раскрываем на весь экран
-                    this.tg.ready(); // Сообщаем Telegram, что приложение готово
+                    this.tg.expand(); 
+                    this.tg.ready();
                 }
             },
             methods: {
@@ -371,13 +360,10 @@
                 },
                 openInTelegramWebView(url) {
                     if (this.isTelegram) {
-                        // Показываем индикатор загрузки
                         this.loading = true;
                         
-                        // Открываем во внутреннем браузере Telegram
                         this.tg.openLink(url, { try_instant_view: true });
                         
-                        // Скрываем индикатор загрузки через некоторое время
                         setTimeout(() => {
                             this.loading = false;
                         }, 2000);
@@ -390,4 +376,5 @@
     </script>
 </body>
 </html>
+
 
